@@ -1,0 +1,89 @@
+<html lang="he">
+    <head>
+   </head>
+    <body dir="rtl">
+        <script>
+        Array.prototype.random = function () {
+            return this[Math.floor((Math.random()*this.length))];
+        }
+
+
+        function getFirst(txt){
+            const n = txt.split(" ");
+            return n[1];
+        }
+
+
+        function getLast(txt,len){
+            const n = txt.split(" ");
+            let line = "";
+            for (let i = len; i > 0; i--){
+                line += " " + n[n.length - i];
+            }
+            return line;
+        }
+
+        function getArrNext(txt,line){
+            const next = [];
+            let i = txt.search(line);
+            if(i == -1) return [];
+
+
+            txt = txt.slice(i + line.length);
+            next.push(getFirst(txt));
+
+            let other = getArrNext(txt,line);
+            for (let i = 0; i < other.length; i++) {
+                const element = other[i];
+                next.push(element)
+            }
+            
+            return next;
+        }
+
+        async function getText(){
+            let index = [2,3]
+            let KookText = await fetch( "/a.txt" ).then( r => r.text() );
+            let words = KookText.split( " " ).filter( x => !!x ); // Split & remove empty lines
+
+            let text = "";
+            let starts = [
+                "תּוֹרָה שֶׁבְּעַל פֶּה",
+                "אַף עַל פִּי",
+                "תּוֹרַת אֶרֶץ יִשְׂרָאֵל",
+                "אִם עַל יְדֵי",
+                "עַל אַדְמַת הַקֹּדֶשׁ",
+                "אִם בְּאֶרֶץ יִשְׂרָאֵל"
+            ]
+
+            text += starts.random();
+
+
+            for (let i = 0; i < 100; i ++){
+                let len = index.random();
+                let nextArr = getArrNext(KookText,getLast(text,len));
+                let nextWord = nextArr.random();
+
+                if(nextArr.length === 0){
+                    text += " " + starts.random();
+                }else{
+                    text += " " + nextWord;
+                }
+            }
+            
+            let i = text.lastIndexOf(".");
+            text = text.slice(0,i+1);
+            return text;
+        }
+
+        (async () => {
+            let text;
+            do{
+                text = await getText();
+            }while(text == "");
+
+            document.write(text);
+        })();
+        </script>
+    </body>
+</html>
